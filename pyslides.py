@@ -14,6 +14,7 @@ from pygame.locals import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, K_RIGHT, K_L
 try:
     import pygame.gfxdraw
     NO3D = False
+#pylint: disable=W0702
 except:
     NO3D = True
 from pygame_markdown import MarkdownRenderer
@@ -33,14 +34,14 @@ CONFIG = {
     'TRANSITION_DURATION': 1.0,
 }
 
-# Load Markdown file
 def load_markdown(filename):
+    """ Load file and get contents """
     with open(filename, "r", encoding="utf-8") as f:
         content = f.read()
     return content
 
-# Parse Markdown into slides
 def parse_slides(md_text, basedir="./"):
+    """ Parse the markdown file into slides """
     slides = []
     current_slide = {"title": "", "content": [], "images": [], "transition": "slide"}
 
@@ -105,7 +106,6 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
     """ Flat version since pygame has no skew transform """
     width = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']
     height = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']
-    b_width = CONFIG['BORDER']['WIDTH']
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])
     for angle in range(0, 181, int(180 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
@@ -116,13 +116,13 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
             screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
         else:
             rotated_surface = pygame.transform.scale(new_slide,
-                                                     (int(width * math.cos(math.radians(180-angle))),
+                                                     (int(width*math.cos(math.radians(180-angle))),
                                                      height))
             screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
-
+#pylint: disable=R0914
 def rotate_3d_transition(screen, old_slide, new_slide, clock):
     """ Makes a pseudo-3D rotation. Could be better if we could skrew the slide """
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])
@@ -211,6 +211,7 @@ def render_slide(slide):
 
     return surface
 
+#pylint: disable=R0915,R0912
 def run_slideshow(md_file):
     """ The main function to run the presentation """
     basedir = "./"
@@ -234,6 +235,7 @@ def run_slideshow(md_file):
 
     current_surface = render_slide(slides[current_slide_idx])
 
+    #pylint: disable=R1702
     while running:
         screen.fill(CONFIG['BORDER']['COLOR'])
         screen.blit(current_surface, (CONFIG['BORDER']['WIDTH'], CONFIG['BORDER']['WIDTH']))
@@ -299,7 +301,9 @@ if __name__ == "__main__":
     if res.style_file:
         import json
         try:
-            NEWSTYLE = json.load(open(res.style_file,'r',encoding="utf-8"))
+            with open(res.style_file,'r',encoding="utf-8") as conf_file:
+                NEWSTYLE = json.load(conf_file)
+        #pylint: disable=W0702
         except:
             print("Failed to open style. using standard values")
         if NEWSTYLE:
@@ -310,4 +314,3 @@ if __name__ == "__main__":
                 else:
                     CONFIG[key] = NEWSTYLE[key]
     run_slideshow(res.slides_filename)
-
