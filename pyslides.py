@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+""" A very simple presentation tool """
+
 import os
 import sys
 import re
 import math
-from PIL import Image
 import argparse
+from PIL import Image
 import pygame
 from pygame.locals import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, K_RIGHT, K_LEFT
 try:
@@ -109,7 +111,7 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
             rotated_surface = pygame.transform.scale(old_slide, (int(width * math.cos(math.radians(angle))), height))
             screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, CONFIG['BORDER']['WIDTH']))
         else:
-            rotated_surface = pygame.transform.scale(new_slide, (int(WIDTH * math.cos(math.radians(180 - angle))), HEIGHT))
+            rotated_surface = pygame.transform.scale(new_slide, (int(width * math.cos(math.radians(180 - angle))), height))
             screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, CONFIG['BORDER']['WIDTH']))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
@@ -211,10 +213,10 @@ def run_slideshow(md_file):
         basedir = "/".join(md_file.split('/')[:-1]) + "/"
     pygame.init()
     if CONFIG['SCREEN']['FULLSCREEN']:
-      screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']),
-                                       pygame.FULLSCREEN)
+        screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']),
+                                         pygame.FULLSCREEN)
     else:
-      screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']))
+        screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']))
     pygame.display.set_caption("Markdown Slideshow")
 
     md_text = load_markdown(md_file)
@@ -287,19 +289,19 @@ if __name__ == "__main__":
     parser.add_argument('slides_filename')
     res = parser.parse_args(sys.argv[1:])
 
-    newstyle = False
+    NEWSTYLE = False
     if res.style_file:
         import json
         try:
-            newstyle = json.load(open(res.style_file,'r'))
+            NEWSTYLE = json.load(open(res.style_file,'r',encoding="utf-8"))
         except:
             print("Failed to open style. using standard values")
-        if newstyle:
-            for key in newstyle.keys():
-                if type(newstyle[key]) == dict:
-                    for key2 in newstyle[key].keys():
-                        CONFIG[key][key2] = newstyle[key][key2]
+        if NEWSTYLE:
+            for key in NEWSTYLE.keys():
+                if type(NEWSTYLE[key]) == dict:
+                    for key2 in NEWSTYLE[key].keys():
+                        CONFIG[key][key2] = NEWSTYLE[key][key2]
                 else:
-                    CONFIG[key] = newstyle[key]
+                    CONFIG[key] = NEWSTYLE[key]
     run_slideshow(res.slides_filename)
 

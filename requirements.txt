@@ -2,3 +2,4 @@
 pygame >= 1.9.6
 markdown >= 3.3.3
 pygame-markdown >= 1.1.6
+pillow
