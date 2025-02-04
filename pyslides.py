@@ -129,7 +129,6 @@ def rotate_3d_transition(screen, old_slide, new_slide, clock):
     w = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']
     h = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']
     bx = CONFIG['BORDER']['WIDTH']
-    by = CONFIG['BORDER']['WIDTH']
 
     for angle in range(0, 181, int(180 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
@@ -146,10 +145,10 @@ def rotate_3d_transition(screen, old_slide, new_slide, clock):
 
         # This is as good as it gets until there is a skew-transform in pygame
         if angle <= 90:
-            texture = pygame.transform.scale(old_slide, (x2-x1+bx*2, h+by*2))
+            texture = pygame.transform.scale(old_slide, (x2-x1+bx*2, h+bx*2))
         else:
-            texture = pygame.transform.scale(new_slide, (x1-x2+bx*2, h+by*2))
-
+            texture = pygame.transform.scale(new_slide, (x1-x2+bx*2, h+bx*2))
+        #pylint: disable=I1101
         pygame.gfxdraw.textured_polygon(screen, [(x1, y1),
                                                  (x2, y2),
                                                  (x2, y3),
@@ -186,8 +185,8 @@ def zoom_3d_transition(screen, old_slide, new_slide, clock):
 # Render slide content to a surface
 def render_slide(slide):
     """ Pre-render a slide """
-    W = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
-    H = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
+    w = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
+    h = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
     surface = pygame.Surface((w,h))
     surface.fill(CONFIG['BG_COLOR'])
     pygame.draw.rect(surface, CONFIG['BG_COLOR'], (0,0, w,h))
@@ -217,10 +216,11 @@ def run_slideshow(md_file):
     basedir = "./"
     if "/" in md_file:
         basedir = "/".join(md_file.split('/')[:-1]) + "/"
+    #pylint: disable=E1101
     pygame.init()
     if CONFIG['SCREEN']['FULLSCREEN']:
         screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']),
-                                         pygame.FULLSCREEN)
+                                         pygame.FULLSCREEN) #pylint: disable=E1101
     else:
         screen = pygame.display.set_mode((CONFIG['SCREEN']['WIDTH'], CONFIG['SCREEN']['HEIGHT']))
     pygame.display.set_caption("Markdown Slideshow")
@@ -281,8 +281,8 @@ def run_slideshow(md_file):
                     current_surface = prev_surface
                     current_slide_idx = prev_slide_idx
 
-        clock.tick(30)
-
+        clock.tick(CONFIG['FPS'])
+    #pylint: disable=E1101
     pygame.quit()
     sys.exit()
 
