@@ -9,6 +9,7 @@ import math
 import argparse
 from PIL import Image
 import pygame
+# pylint: disable=E0611
 from pygame.locals import QUIT, KEYDOWN, K_ESCAPE, MOUSEBUTTONDOWN, K_RIGHT, K_LEFT
 try:
     import pygame.gfxdraw
@@ -104,15 +105,20 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
     """ Flat version since pygame has no skew transform """
     width = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']
     height = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']
+    b_width = CONFIG['BORDER']['WIDTH']
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])
     for angle in range(0, 181, int(180 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
         if angle <= 90:
-            rotated_surface = pygame.transform.scale(old_slide, (int(width * math.cos(math.radians(angle))), height))
-            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, CONFIG['BORDER']['WIDTH']))
+            rotated_surface = pygame.transform.scale(old_slide,
+                                                     (int(width * math.cos(math.radians(angle))),
+                                                     height))
+            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
         else:
-            rotated_surface = pygame.transform.scale(new_slide, (int(width * math.cos(math.radians(180 - angle))), height))
-            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, CONFIG['BORDER']['WIDTH']))
+            rotated_surface = pygame.transform.scale(new_slide,
+                                                     (int(width * math.cos(math.radians(180-angle))),
+                                                     height))
+            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
@@ -156,23 +162,23 @@ def rotate_3d_transition(screen, old_slide, new_slide, clock):
 def zoom_3d_transition(screen, old_slide, new_slide, clock):
     """ Zooms out of old slide and in to new """
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])/2
-    W = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
-    H = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
-    B = CONFIG['BORDER']['WIDTH']
+    w = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
+    h = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
+    b = CONFIG['BORDER']['WIDTH']
 
     for scale in range(100, 0, -int(100 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
-        zoomed_surface = pygame.transform.scale(old_slide, (int(W * scale / 100), int(H * scale / 100)))
-        screen.blit(zoomed_surface, ((W - zoomed_surface.get_width()) // 2 + B,
-                                     (H - zoomed_surface.get_height()) // 2 + B))
+        zoomed_surface = pygame.transform.scale(old_slide, (int(w*scale/100), int(h*scale/100)))
+        screen.blit(zoomed_surface, ((w - zoomed_surface.get_width()) // 2 + b,
+                                     (h - zoomed_surface.get_height()) // 2 + b))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
     for scale in range(0, 100, int(100 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
-        zoomed_surface = pygame.transform.scale(new_slide, (int(W * scale / 100), int(H * scale / 100)))
-        screen.blit(zoomed_surface, ((W - zoomed_surface.get_width()) // 2 + B,
-                                     (H - zoomed_surface.get_height()) // 2 + B))
+        zoomed_surface = pygame.transform.scale(new_slide, (int(w*scale/100), int(h*scale/100)))
+        screen.blit(zoomed_surface, ((w - zoomed_surface.get_width()) // 2 + b,
+                                     (h - zoomed_surface.get_height()) // 2 + b))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
@@ -182,15 +188,15 @@ def render_slide(slide):
     """ Pre-render a slide """
     W = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
     H = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
-    surface = pygame.Surface((W,H))
+    surface = pygame.Surface((w,h))
     surface.fill(CONFIG['BG_COLOR'])
-    pygame.draw.rect(surface, CONFIG['BG_COLOR'], (0,0, W,H))
+    pygame.draw.rect(surface, CONFIG['BG_COLOR'], (0,0, w,h))
 
     md = MarkdownRenderer()
     mdtxt = "# " + slide['title'] + "\n" + "\n".join(slide['content'])
 
     md.set_markdown_from_string(md_string=mdtxt)
-    md.set_area(surface=surface, offset_x=0, offset_y=0, width=W//2, height=H)
+    md.set_area(surface=surface, offset_x=0, offset_y=0, width=w//2, height=h)
     md.set_color_background(*CONFIG['BG_COLOR'])
     md.set_color_font(*CONFIG['TEXT_COLOR'])
     md.set_font_sizes(*CONFIG['FONT_SIZES'])
@@ -201,7 +207,7 @@ def render_slide(slide):
     for img_path in slide["images"]:
         image = load_image(img_path)
         if image:
-            surface.blit(image, (W // 2 + CONFIG['FONT_SIZES'][1], y_offset))
+            surface.blit(image, (w // 2 + CONFIG['FONT_SIZES'][1], y_offset))
             y_offset += image.get_height() + 20
 
     return surface
