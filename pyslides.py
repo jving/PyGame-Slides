@@ -55,7 +55,8 @@ def parse_slides(md_text, basedir="./"):
         elif line.startswith("!"):
             start = line.find("(") + 1
             end = line.find(")")
-            if start > 0 and end > start:
+            #pylint: disable=R1716
+            if start > 0 and start < end:
                 current_slide["images"].append(basedir + line[start:end])
         else:
             current_slide["content"].append(line)
@@ -107,6 +108,7 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
     width = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']
     height = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])
+    bwidth = CONFIG['BORDER']['WIDTH']
     for angle in range(0, 181, int(180 / steps)):
         screen.fill(CONFIG['BORDER']['COLOR'])
         if angle <= 90:
@@ -308,7 +310,7 @@ if __name__ == "__main__":
             print("Failed to open style. using standard values")
         if NEWSTYLE:
             for key in NEWSTYLE.keys():
-                if type(NEWSTYLE[key]) == dict:
+                if isinstance(NEWSTYLE[key], dict):
                     for key2 in NEWSTYLE[key].keys():
                         CONFIG[key][key2] = NEWSTYLE[key][key2]
                 else:
