@@ -50,7 +50,7 @@ def parse_slides(md_text, basedir="./"):
             if current_slide["title"]:
                 slides.append(current_slide)
             current_slide = {"title": line[2:], "content": [], "images": [], "transition": "slide"}
-        elif re.match(r"<!--\s*transition:\s*(slide|fade|3d-rotate|3d-zoom)\s*-->", line):
+        elif re.match(r"<!--\s*transition:\s*(slide|fade|3d-rotate|2d-rotate|3d-zoom)\s*-->", line):
             current_slide["transition"] = line.split(":")[1].strip().replace("-->", "").strip()
         elif line.startswith("!"):
             start = line.find("(") + 1
@@ -105,8 +105,8 @@ def fade_transition(screen, old_slide, new_slide, clock):
 
 def rotate_2d_transition(screen, old_slide, new_slide, clock):
     """ Flat version since pygame has no skew transform """
-    width = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']
-    height = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']
+    width = CONFIG['SCREEN']['WIDTH']-CONFIG['BORDER']['WIDTH']*2
+    height = CONFIG['SCREEN']['HEIGHT']-CONFIG['BORDER']['WIDTH']*2
     steps = int(CONFIG['FPS']*CONFIG['TRANSITION_DURATION'])
     bwidth = CONFIG['BORDER']['WIDTH']
     for angle in range(0, 181, int(180 / steps)):
@@ -115,12 +115,12 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
             rotated_surface = pygame.transform.scale(old_slide,
                                                      (int(width * math.cos(math.radians(angle))),
                                                      height))
-            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
+            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2, bwidth))
         else:
             rotated_surface = pygame.transform.scale(new_slide,
                                                      (int(width*math.cos(math.radians(180-angle))),
                                                      height))
-            screen.blit(rotated_surface, ((width - rotated_surface.get_width()) // 2, bwidth))
+            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2, bwidth))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
@@ -253,6 +253,8 @@ def run_slideshow(md_file):
                     transition = slides[next_slide_idx]["transition"]
                     if transition == "fade":
                         fade_transition(screen, current_surface, next_surface, clock)
+                    elif transition == "2d-rotate":
+                        rotate_2d_transition(screen, current_surface, next_surface, clock)
                     elif transition == "3d-rotate":
                         if NO3D:
                             rotate_2d_transition(screen, current_surface, next_surface, clock)
@@ -271,6 +273,8 @@ def run_slideshow(md_file):
                     transition = slides[prev_slide_idx]["transition"]
                     if transition == "fade":
                         fade_transition(screen, current_surface, prev_surface, clock)
+                    elif transition == "2d-rotate":
+                        otate_2d_transition(screen, current_surface, prev_surface, clock)
                     elif transition == "3d-rotate":
                         if NO3D:
                             rotate_2d_transition(screen, current_surface, prev_surface, clock)

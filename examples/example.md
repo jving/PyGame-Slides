@@ -10,6 +10,7 @@ I thought of this as I though of a game called "presentation roulette". So hopef
 <!-- transition: 3d-rotate -->
 
 # Can I use tables?
+<!-- transition: 2d-rotate -->
 We try:
 | Month    | Savings |
 | -------- | ------- |
