@@ -115,12 +115,14 @@ def rotate_2d_transition(screen, old_slide, new_slide, clock):
             rotated_surface = pygame.transform.scale(old_slide,
                                                      (int(width * math.cos(math.radians(angle))),
                                                      height))
-            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2, bwidth))
+            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2,
+                                          bwidth))
         else:
             rotated_surface = pygame.transform.scale(new_slide,
                                                      (int(width*math.cos(math.radians(180-angle))),
                                                      height))
-            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2, bwidth))
+            screen.blit(rotated_surface, (bwidth+(width - rotated_surface.get_width()) // 2,
+                                          bwidth))
         pygame.display.flip()
         clock.tick(CONFIG['FPS'])
 
@@ -274,7 +276,7 @@ def run_slideshow(md_file):
                     if transition == "fade":
                         fade_transition(screen, current_surface, prev_surface, clock)
                     elif transition == "2d-rotate":
-                        otate_2d_transition(screen, current_surface, prev_surface, clock)
+                        rotate_2d_transition(screen, current_surface, prev_surface, clock)
                     elif transition == "3d-rotate":
                         if NO3D:
                             rotate_2d_transition(screen, current_surface, prev_surface, clock)
